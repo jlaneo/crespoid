@@ -20,7 +20,7 @@ export const ApiKeyForm: React.FC<ApiKeyFormProps> = ({ onApiKeySubmit }) => {
         Configurar API Key de Google Gemini
       </h2>
       <p className="text-notion-text-light mb-6">
-        Para usar esta aplicación en tu entorno local, por favor ingresa tu API key. Será guardada únicamente en la sesión de tu navegador. Si despliegas esta aplicación en Vercel, la clave se leerá automáticamente de las variables de entorno.
+        Para usar esta aplicación en tu entorno local, por favor ingresa tu API key de Google Gemini. Será guardada únicamente en la sesión de tu navegador. Cuando despliegues en Vercel, asegúrate de configurar la variable de entorno <code className="bg-notion-bg text-notion-accent font-mono px-1.5 py-1 rounded-md text-sm">GEMINI_API_KEY</code>.
       </p>
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
         <input

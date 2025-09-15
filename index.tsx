@@ -4,7 +4,7 @@ import App from './App';
 
 // --- API Key Bootstrapping ---
 // This script runs before the app mounts. It ensures that the Gemini API key
-// is available in a consistent way (process.env.API_KEY), whether it's
+// is available in a consistent way (process.env.GEMINI_API_KEY), whether it's
 // provided by Vercel's environment variables or stored in sessionStorage
 // for local development.
 
@@ -15,10 +15,10 @@ if (typeof (window as any).process === 'undefined') {
 
 // 2. Load the API key from sessionStorage into the polyfilled process.env.
 // This allows local development without exposing the key in the code.
-// On Vercel, process.env.API_KEY will already be set, so this won't overwrite it.
+// On Vercel, process.env.GEMINI_API_KEY will already be set, so this won't overwrite it.
 const apiKeyFromSession = sessionStorage.getItem('gemini-api-key');
-if (apiKeyFromSession && !(window as any).process.env.API_KEY) {
-  (window as any).process.env.API_KEY = apiKeyFromSession;
+if (apiKeyFromSession && !(window as any).process.env.GEMINI_API_KEY) {
+  (window as any).process.env.GEMINI_API_KEY = apiKeyFromSession;
 }
 // --- End of Bootstrapping ---
 

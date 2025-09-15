@@ -8,7 +8,7 @@ import { ApiKeyForm } from './components/ApiKeyForm';
 
 // Helper to check if API key is configured.
 const isApiKeyConfigured = (): boolean => {
-    return !!(process.env.API_KEY);
+    return !!(process.env.GEMINI_API_KEY);
 };
 
 
@@ -27,7 +27,7 @@ const App: React.FC = () => {
         if (typeof (window as any).process === 'undefined') {
             (window as any).process = { env: {} };
         }
-        (window as any).process.env.API_KEY = apiKey;
+        (window as any).process.env.GEMINI_API_KEY = apiKey;
         
         // Clear previous errors and update the state to show the app instantly
         setError(null);
@@ -67,7 +67,7 @@ const App: React.FC = () => {
                  sessionStorage.removeItem('gemini-api-key');
                  // Also clear the polyfilled env variable
                  if ((window as any).process?.env) {
-                    delete (window as any).process.env.API_KEY;
+                    delete (window as any).process.env.GEMINI_API_KEY;
                  }
                  setError(err.message + " Por favor, configúrala de nuevo.");
                  setApiKeyReady(false);
@@ -147,7 +147,7 @@ const App: React.FC = () => {
         <div className="min-h-screen bg-notion-bg flex flex-col items-center p-4 sm:p-6 md:p-10">
             <header className="w-full max-w-4xl text-center mb-10">
                 <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-notion-text">
-                    El Crespo ID
+                    BioScan
                 </h1>
                 <p className="text-lg text-notion-text-light mt-2">
                     Sube una foto y descubre todo sobre cualquier especie animal.
@@ -159,7 +159,7 @@ const App: React.FC = () => {
             </main>
 
             <footer className="w-full max-w-4xl text-center text-notion-text-light mt-12 text-sm">
-                <p>© 2025 El Crespo ID. Creado por JL Arias con tecnologia AI.</p>
+                <p>© 2025 BioScan. Creado por JL Arias con tecnologia AI.</p>
             </footer>
         </div>
     );

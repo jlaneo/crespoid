@@ -129,11 +129,11 @@ const getAnimalDataSchema = () => ({
 
 
 export const identifyAnimal = async (base64Image: string, mimeType: string): Promise<AnimalData> => {
-    if (!process.env.API_KEY) {
-        throw new Error("API_KEY no configurada. Por favor, ingrésala en la aplicación o configúrala como una variable de entorno en Vercel.");
+    if (!process.env.GEMINI_API_KEY) {
+        throw new Error("GEMINI_API_KEY no configurada. Por favor, ingrésala en la aplicación o configúrala como una variable de entorno en Vercel.");
     }
 
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     
     const imagePart = {
         inlineData: {
@@ -169,11 +169,11 @@ export const identifyAnimal = async (base64Image: string, mimeType: string): Pro
 };
 
 export const generateAnimalImage = async (animalName: string, habitat: string): Promise<string> => {
-    if (!process.env.API_KEY) {
-        throw new Error("API_KEY no configurada. Por favor, ingrésala en la aplicación o configúrala como una variable de entorno en Vercel.");
+    if (!process.env.GEMINI_API_KEY) {
+        throw new Error("GEMINI_API_KEY no configurada. Por favor, ingrésala en la aplicación o configúrala como una variable de entorno en Vercel.");
     }
 
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
     const prompt = `Ultra-realistic, professional photograph of a ${animalName} in its natural habitat, which is ${habitat}. Centered, detailed, 4k, natural lighting, wildlife photography.`;
 
