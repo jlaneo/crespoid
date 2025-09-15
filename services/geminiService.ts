@@ -1,11 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { AnimalData } from "../types";
 
-// WARNING: Storing API keys in source code is not recommended for production applications.
-// This is for development and demonstration purposes only.
-const API_KEY = "AIzaSyAjHyvlJrhHhVFu8PyVB2vQuXmfVEMadBk";
-
-
 const PROMPT = `
 Tu vida depende de esto. Eres un biólogo experto de National Geographic. Analiza la imagen de este animal y genera una ficha de identificación completa y científicamente precisa en español. Sigue estrictamente el formato JSON solicitado.
 
@@ -134,11 +129,11 @@ const getAnimalDataSchema = () => ({
 
 
 export const identifyAnimal = async (base64Image: string, mimeType: string): Promise<AnimalData> => {
-    if (!API_KEY) {
-        throw new Error("API_KEY is not set in geminiService.ts");
+    if (!process.env.API_KEY) {
+        throw new Error("API_KEY environment variable not set");
     }
 
-    const ai = new GoogleGenAI({ apiKey: API_KEY });
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     
     const imagePart = {
         inlineData: {
@@ -166,16 +161,19 @@ export const identifyAnimal = async (base64Image: string, mimeType: string): Pro
         return data;
     } catch (error) {
         console.error("Error calling Gemini API for identification:", error);
+        if (error instanceof Error && error.message.includes('API key not valid')) {
+            throw new Error("La API Key de Gemini no es válida. Revisa la variable de entorno en Vercel.");
+        }
         throw new Error("Failed to identify the animal. The AI model could not process the request.");
     }
 };
 
 export const generateAnimalImage = async (animalName: string, habitat: string): Promise<string> => {
-    if (!API_KEY) {
-        throw new Error("API_KEY is not set in geminiService.ts");
+    if (!process.env.API_KEY) {
+        throw new Error("API_KEY environment variable not set");
     }
 
-    const ai = new GoogleGenAI({ apiKey: API_KEY });
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
     const prompt = `Ultra-realistic, professional photograph of a ${animalName} in its natural habitat, which is ${habitat}. Centered, detailed, 4k, natural lighting, wildlife photography.`;
 
@@ -198,6 +196,9 @@ export const generateAnimalImage = async (animalName: string, habitat: string): 
         }
     } catch (error) {
         console.error("Error generating image with Gemini:", error);
+        if (error instanceof Error && error.message.includes('API key not valid')) {
+            throw new Error("La API Key de Gemini no es válida. Revisa la variable de entorno en Vercel.");
+        }
         throw new Error("Failed to generate the animal's habitat image.");
     }
 };

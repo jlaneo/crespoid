@@ -37,7 +37,6 @@ const App: React.FC = () => {
             setAnimalData(data);
 
             setStatusMessage('Generando foto del hábitat...');
-            // FIX: Pass the `text` property of `specificHabitat` to `generateAnimalImage` as it expects a string, not a DescriptiveText object.
             const imageUrl = await generateAnimalImage(data.identification.commonName, data.habitatAndBehavior.specificHabitat.text);
             setGeneratedImageUrl(imageUrl);
 
@@ -52,7 +51,7 @@ const App: React.FC = () => {
             setStatusMessage('');
         }
     }, []);
-
+    
     const resetState = () => {
         setAnimalData(null);
         setGeneratedImageUrl('');
@@ -67,7 +66,7 @@ const App: React.FC = () => {
         }
         if (error) {
             return (
-                <div className="text-center bg-red-900/50 border border-red-700 p-6 rounded-lg max-w-md">
+                <div className="text-center bg-red-900/50 border border-red-700 p-6 rounded-lg max-w-md mx-auto">
                     <h2 className="text-2xl font-bold mb-2 text-red-300">
                         Error al procesar
                     </h2>
