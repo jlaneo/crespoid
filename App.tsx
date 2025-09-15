@@ -19,7 +19,6 @@ const App: React.FC = () => {
     const [statusMessage, setStatusMessage] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const [apiKeyReady, setApiKeyReady] = useState(isApiKeyConfigured());
-    const [isImageAiGenerated, setIsImageAiGenerated] = useState<boolean>(true);
 
     const handleApiKeySubmit = (apiKey: string) => {
         sessionStorage.setItem('gemini-api-key', apiKey);
@@ -35,14 +34,13 @@ const App: React.FC = () => {
         setApiKeyReady(true);
     };
     
-    const fileToDataAndBase64 = (file: File): Promise<{ base64: string, dataUrl: string }> => {
+    const fileToBase64 = (file: File): Promise<string> => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => {
-                const dataUrl = reader.result as string;
-                const base64 = dataUrl.split(',')[1];
-                resolve({ base64, dataUrl });
+                const result = reader.result as string;
+                resolve(result.split(',')[1]);
             };
             reader.onerror = (error) => reject(error);
         });
@@ -53,32 +51,23 @@ const App: React.FC = () => {
         setError(null);
         setAnimalData(null);
         setGeneratedImageUrl('');
-        setIsImageAiGenerated(true);
         
         try {
-            setStatusMessage('Procesando imagen...');
-            const { base64: base64Image, dataUrl: userImageUrl } = await fileToDataAndBase64(file);
-            
             setStatusMessage('Identificando especie...');
+            const base64Image = await fileToBase64(file);
             const data = await identifyAnimal(base64Image, file.type);
             setAnimalData(data);
 
-            try {
-                setStatusMessage('Generando foto del animal...');
-                const imageUrl = await generateAnimalImage(
-                    data.identification.commonName
-                );
-                setGeneratedImageUrl(imageUrl);
-                setIsImageAiGenerated(true);
-            } catch (imageGenError) {
-                console.warn('AI image generation failed. Falling back to user-uploaded image.', imageGenError);
-                setGeneratedImageUrl(userImageUrl);
-                setIsImageAiGenerated(false);
-            }
+            setStatusMessage('Generando foto del animal...');
+            const imageUrl = await generateAnimalImage(
+                data.identification.commonName
+            );
+            setGeneratedImageUrl(imageUrl);
 
         } catch (err) {
             if (err instanceof Error && err.message.includes('API Key de Gemini no es válida')) {
                  sessionStorage.removeItem('gemini-api-key');
+                 // Also clear the polyfilled env variable
                  if ((window as any).process?.env) {
                     delete (window as any).process.env.GEMINI_API_KEY;
                  }
@@ -101,7 +90,6 @@ const App: React.FC = () => {
         setError(null);
         setIsLoading(false);
         setStatusMessage('');
-        setIsImageAiGenerated(true);
     }
 
     if (!apiKeyReady) {
@@ -150,7 +138,7 @@ const App: React.FC = () => {
                             Identificar Otro Animal
                         </button>
                     </div>
-                    <FactSheet data={animalData} imageUrl={generatedImageUrl} isAiGenerated={isImageAiGenerated} />
+                    <FactSheet data={animalData} imageUrl={generatedImageUrl} />
                 </div>
             );
         }
