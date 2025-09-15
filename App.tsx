@@ -4,6 +4,13 @@ import { LoadingSpinner } from './components/LoadingSpinner';
 import { FactSheet } from './components/FactSheet';
 import { AnimalData } from './types';
 import { identifyAnimal, generateAnimalImage } from './services/geminiService';
+import { ApiKeyForm } from './components/ApiKeyForm';
+
+// Helper to check if API key is configured.
+const isApiKeyConfigured = (): boolean => {
+    return !!(process.env.API_KEY);
+};
+
 
 const App: React.FC = () => {
     const [animalData, setAnimalData] = useState<AnimalData | null>(null);
@@ -11,6 +18,13 @@ const App: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [statusMessage, setStatusMessage] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
+    const [apiKeyReady, setApiKeyReady] = useState(isApiKeyConfigured());
+
+    const handleApiKeySubmit = (apiKey: string) => {
+        sessionStorage.setItem('gemini-api-key', apiKey);
+        // Reload the page to run the bootstrapping script in index.tsx
+        window.location.reload();
+    };
     
     const fileToBase64 = (file: File): Promise<string> => {
         return new Promise((resolve, reject) => {
@@ -41,7 +55,11 @@ const App: React.FC = () => {
             setGeneratedImageUrl(imageUrl);
 
         } catch (err) {
-            if (err instanceof Error) {
+            if (err instanceof Error && err.message.includes('API Key de Gemini no es válida')) {
+                 sessionStorage.removeItem('gemini-api-key');
+                 setError(err.message + " Por favor, configúrala de nuevo.");
+                 setApiKeyReady(false);
+            } else if (err instanceof Error) {
                 setError(err.message);
             } else {
                 setError('An unknown error occurred.');
@@ -58,6 +76,19 @@ const App: React.FC = () => {
         setError(null);
         setIsLoading(false);
         setStatusMessage('');
+    }
+
+    if (!apiKeyReady) {
+        return (
+            <div className="min-h-screen bg-notion-bg flex flex-col items-center justify-center p-4">
+                {error && (
+                     <div className="text-center bg-red-900/50 border border-red-700 p-4 rounded-lg max-w-lg mx-auto mb-6">
+                        <p className="text-red-300">{error}</p>
+                     </div>
+                )}
+                <ApiKeyForm onApiKeySubmit={handleApiKeySubmit} />
+            </div>
+        );
     }
     
     const renderContent = () => {
@@ -104,7 +135,7 @@ const App: React.FC = () => {
         <div className="min-h-screen bg-notion-bg flex flex-col items-center p-4 sm:p-6 md:p-10">
             <header className="w-full max-w-4xl text-center mb-10">
                 <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-notion-text">
-                    Animal Identifier AI
+                    El Crespo ID
                 </h1>
                 <p className="text-lg text-notion-text-light mt-2">
                     Sube una foto y descubre todo sobre cualquier especie animal.
@@ -116,7 +147,7 @@ const App: React.FC = () => {
             </main>
 
             <footer className="w-full max-w-4xl text-center text-notion-text-light mt-12 text-sm">
-                <p>© 2025 Animal ID. Creado por JL Arias con tecnologia AI.</p>
+                <p>© 2025 El Crespo ID. Creado por JL Arias con tecnologia AI.</p>
             </footer>
         </div>
     );

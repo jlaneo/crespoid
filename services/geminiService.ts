@@ -130,7 +130,7 @@ const getAnimalDataSchema = () => ({
 
 export const identifyAnimal = async (base64Image: string, mimeType: string): Promise<AnimalData> => {
     if (!process.env.API_KEY) {
-        throw new Error("API_KEY environment variable not set");
+        throw new Error("API_KEY no configurada. Por favor, ingrésala en la aplicación o configúrala como una variable de entorno en Vercel.");
     }
 
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -161,16 +161,16 @@ export const identifyAnimal = async (base64Image: string, mimeType: string): Pro
         return data;
     } catch (error) {
         console.error("Error calling Gemini API for identification:", error);
-        if (error instanceof Error && error.message.includes('API key not valid')) {
-            throw new Error("La API Key de Gemini no es válida. Revisa la variable de entorno en Vercel.");
+        if (error instanceof Error && (error.message.includes('API key not valid') || error.message.includes('invalid'))) {
+            throw new Error("La API Key de Gemini no es válida.");
         }
-        throw new Error("Failed to identify the animal. The AI model could not process the request.");
+        throw new Error("No se pudo identificar el animal. El modelo de IA no pudo procesar la solicitud.");
     }
 };
 
 export const generateAnimalImage = async (animalName: string, habitat: string): Promise<string> => {
     if (!process.env.API_KEY) {
-        throw new Error("API_KEY environment variable not set");
+        throw new Error("API_KEY no configurada. Por favor, ingrésala en la aplicación o configúrala como una variable de entorno en Vercel.");
     }
 
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -196,9 +196,9 @@ export const generateAnimalImage = async (animalName: string, habitat: string): 
         }
     } catch (error) {
         console.error("Error generating image with Gemini:", error);
-        if (error instanceof Error && error.message.includes('API key not valid')) {
-            throw new Error("La API Key de Gemini no es válida. Revisa la variable de entorno en Vercel.");
+        if (error instanceof Error && (error.message.includes('API key not valid') || error.message.includes('invalid'))) {
+            throw new Error("La API Key de Gemini no es válida.");
         }
-        throw new Error("Failed to generate the animal's habitat image.");
+        throw new Error("No se pudo generar la imagen del hábitat del animal.");
     }
 };
