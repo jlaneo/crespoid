@@ -68,8 +68,12 @@ const App: React.FC = () => {
         if (error) {
             return (
                 <div className="text-center bg-red-900/50 border border-red-700 p-6 rounded-lg max-w-md">
-                    <h2 className="text-2xl font-bold mb-2 text-red-300">Error al procesar</h2>
-                    <p className="text-red-300">{error}</p>
+                    <h2 className="text-2xl font-bold mb-2 text-red-300">
+                        Error al procesar
+                    </h2>
+                    <p className="text-red-300">
+                        {error}
+                    </p>
                     <button
                         onClick={resetState}
                         className="mt-6 bg-notion-accent text-white font-bold py-2 px-6 rounded-md hover:bg-blue-700 transition-colors"
