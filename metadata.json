@@ -1,0 +1,5 @@
+{
+  "name": "Animal Identifier AI",
+  "description": "An application that allows users to photograph any animal and automatically generate a complete and scientifically accurate identification card, in the style of National Geographic. It's designed for students, educators, and wildlife enthusiasts.",
+  "requestFramePermissions": []
+}
