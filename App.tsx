@@ -59,7 +59,12 @@ const App: React.FC = () => {
             setAnimalData(data);
 
             setStatusMessage('Generando foto del hábitat...');
-            const imageUrl = await generateAnimalImage(data.identification.commonName, data.habitatAndBehavior.specificHabitat.text);
+            const imageUrl = await generateAnimalImage(
+                data.identification.commonName, 
+                data.habitatAndBehavior.specificHabitat.text,
+                base64Image,
+                file.type
+            );
             setGeneratedImageUrl(imageUrl);
 
         } catch (err) {
