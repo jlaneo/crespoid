@@ -168,43 +168,29 @@ export const identifyAnimal = async (base64Image: string, mimeType: string): Pro
     }
 };
 
-export const generateAnimalImage = async (animalName: string, habitat: string, base64Image: string, mimeType: string): Promise<string> => {
+export const generateAnimalImage = async (animalName: string): Promise<string> => {
     if (!process.env.GEMINI_API_KEY) {
         throw new Error("GEMINI_API_KEY no configurada. Por favor, ingrésala en la aplicación o configúrala como una variable de entorno en Vercel.");
     }
 
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-    const prompt = `Toma el animal de la imagen proporcionada (${animalName}) y colócalo en su hábitat natural, que se describe como: ${habitat}. Crea una fotografía realista y de aspecto profesional. La imagen final solo debe contener el animal en su nuevo hábitat.`;
-
-    const imagePart = {
-        inlineData: {
-            data: base64Image,
-            mimeType: mimeType,
-        },
-    };
-
-    const textPart = {
-        text: prompt,
-    };
+    const prompt = `Una fotografía realista de un ${animalName} en su hábitat natural, estilo National Geographic, de alta calidad.`;
 
     try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash-image-preview',
-            contents: {
-                parts: [imagePart, textPart],
-            },
+        const response = await ai.models.generateImages({
+            model: 'imagen-4.0-generate-001',
+            prompt: prompt,
             config: {
-                responseModalities: [Modality.IMAGE, Modality.TEXT],
+              numberOfImages: 1,
+              outputMimeType: 'image/jpeg',
+              aspectRatio: '4:3',
             },
         });
 
-        for (const part of response.candidates[0].content.parts) {
-            if (part.inlineData) {
-                const base64ImageBytes: string = part.inlineData.data;
-                const imageMimeType = part.inlineData.mimeType;
-                return `data:${imageMimeType};base64,${base64ImageBytes}`;
-            }
+        if (response.generatedImages && response.generatedImages.length > 0) {
+            const base64ImageBytes: string = response.generatedImages[0].image.imageBytes;
+            return `data:image/jpeg;base64,${base64ImageBytes}`;
         }
         
         throw new Error("El modelo no devolvió una imagen.");
@@ -214,6 +200,6 @@ export const generateAnimalImage = async (animalName: string, habitat: string, b
         if (error instanceof Error && (error.message.includes('API key not valid') || error.message.includes('invalid'))) {
             throw new Error("La API Key de Gemini no es válida.");
         }
-        throw new Error("No se pudo generar la imagen del hábitat del animal.");
+        throw new Error("No se pudo generar la imagen del animal.");
     }
 };
