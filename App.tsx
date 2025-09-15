@@ -22,8 +22,16 @@ const App: React.FC = () => {
 
     const handleApiKeySubmit = (apiKey: string) => {
         sessionStorage.setItem('gemini-api-key', apiKey);
-        // Reload the page to run the bootstrapping script in index.tsx
-        window.location.reload();
+        
+        // Polyfill the process.env for the current session without a page reload
+        if (typeof (window as any).process === 'undefined') {
+            (window as any).process = { env: {} };
+        }
+        (window as any).process.env.API_KEY = apiKey;
+        
+        // Clear previous errors and update the state to show the app instantly
+        setError(null);
+        setApiKeyReady(true);
     };
     
     const fileToBase64 = (file: File): Promise<string> => {
@@ -57,6 +65,10 @@ const App: React.FC = () => {
         } catch (err) {
             if (err instanceof Error && err.message.includes('API Key de Gemini no es válida')) {
                  sessionStorage.removeItem('gemini-api-key');
+                 // Also clear the polyfilled env variable
+                 if ((window as any).process?.env) {
+                    delete (window as any).process.env.API_KEY;
+                 }
                  setError(err.message + " Por favor, configúrala de nuevo.");
                  setApiKeyReady(false);
             } else if (err instanceof Error) {
