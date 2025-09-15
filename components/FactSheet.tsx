@@ -41,9 +41,10 @@ const GlossaryText: React.FC<{ content?: DescriptiveText }> = ({ content }) => {
 interface FactSheetProps {
     data: AnimalData;
     imageUrl: string;
+    isAiGenerated: boolean;
 }
 
-export const FactSheet: React.FC<FactSheetProps> = ({ data, imageUrl }) => {
+export const FactSheet: React.FC<FactSheetProps> = ({ data, imageUrl, isAiGenerated }) => {
     const factSheetRef = useRef<HTMLDivElement>(null);
 
     const handleDownloadPdf = () => {
@@ -81,6 +82,10 @@ export const FactSheet: React.FC<FactSheetProps> = ({ data, imageUrl }) => {
         </div>
     );
 
+    const altText = isAiGenerated
+        ? `AI-generated image of a ${data.identification.commonName} in its habitat`
+        : `User-uploaded image of a ${data.identification.commonName}`;
+
     return (
         <div className="max-w-4xl mx-auto my-10">
             <div className="text-right mb-4">
@@ -111,7 +116,7 @@ export const FactSheet: React.FC<FactSheetProps> = ({ data, imageUrl }) => {
                 
                 <div className="w-full aspect-[4/3] rounded-md overflow-hidden shadow-lg mb-10">
                     {imageUrl ? (
-                        <img src={imageUrl} alt={`AI-generated image of a ${data.identification.commonName} in its habitat`} className="w-full h-full object-cover" />
+                        <img src={imageUrl} alt={altText} className="w-full h-full object-cover" />
                      ) : (
                         <div className="w-full h-full bg-notion-border flex items-center justify-center">
                             <p className="text-notion-text-light">Generando imagen...</p>

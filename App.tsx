@@ -85,3 +85,98 @@ const App: React.FC = () => {
                  setError(err.message + " Por favor, configúrala de nuevo.");
                  setApiKeyReady(false);
             } else if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError('An unknown error occurred.');
+            }
+        } finally {
+            setIsLoading(false);
+            setStatusMessage('');
+        }
+    }, []);
+    
+    const resetState = () => {
+        setAnimalData(null);
+        setGeneratedImageUrl('');
+        setError(null);
+        setIsLoading(false);
+        setStatusMessage('');
+        setIsImageAiGenerated(true);
+    }
+
+    if (!apiKeyReady) {
+        return (
+            <div className="min-h-screen bg-notion-bg flex flex-col items-center justify-center p-4">
+                {error && (
+                     <div className="text-center bg-red-900/50 border border-red-700 p-4 rounded-lg max-w-lg mx-auto mb-6">
+                        <p className="text-red-300">{error}</p>
+                     </div>
+                )}
+                <ApiKeyForm onApiKeySubmit={handleApiKeySubmit} />
+            </div>
+        );
+    }
+    
+    const renderContent = () => {
+        if (isLoading) {
+            return <LoadingSpinner message={statusMessage} />;
+        }
+        if (error) {
+            return (
+                <div className="text-center bg-red-900/50 border border-red-700 p-6 rounded-lg max-w-md mx-auto">
+                    <h2 className="text-2xl font-bold mb-2 text-red-300">
+                        Error al procesar
+                    </h2>
+                    <p className="text-red-300">
+                        {error}
+                    </p>
+                    <button
+                        onClick={resetState}
+                        className="mt-6 bg-notion-accent text-white font-bold py-2 px-6 rounded-md hover:bg-blue-700 transition-colors"
+                    >
+                        Intentar de Nuevo
+                    </button>
+                </div>
+            );
+        }
+        if (animalData) {
+            return (
+                <div className="w-full">
+                     <div className="text-center">
+                        <button
+                            onClick={resetState}
+                            className="mb-4 bg-notion-surface border border-notion-border text-notion-text font-bold py-2 px-6 rounded-md hover:bg-notion-border transition-colors"
+                        >
+                            Identificar Otro Animal
+                        </button>
+                    </div>
+                    <FactSheet data={animalData} imageUrl={generatedImageUrl} isAiGenerated={isImageAiGenerated} />
+                </div>
+            );
+        }
+        return <ImageUploader onIdentify={handleIdentify} isLoading={isLoading} />;
+    };
+
+    return (
+        <div className="min-h-screen bg-notion-bg flex flex-col items-center p-4 sm:p-6 md:p-10">
+            <header className="w-full max-w-4xl text-center mb-10">
+                <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-notion-text">
+                    BioScan
+                </h1>
+                <p className="text-lg text-notion-text-light mt-2">
+                    Sube una foto y descubre todo sobre cualquier especie animal.
+                </p>
+            </header>
+
+            <main className="w-full flex-grow flex flex-col items-center justify-center">
+                {renderContent()}
+            </main>
+
+            <footer className="w-full max-w-4xl text-center text-notion-text-light mt-12 text-sm">
+                <p>© 2025 BioScan. Creado por JL Arias con tecnologia AI.</p>
+            </footer>
+        </div>
+    );
+};
+
+export default App;
